@@ -1,0 +1,92 @@
+import java.util.ArrayList;
+import java.util.List;
+
+import jdk.internal.loader.AbstractClassLoaderValue;
+
+class Article {
+
+    final String title;
+
+    Article(final String title) {
+        this.title = title;
+    }
+}
+
+interface Subscriber{
+    void update(Article article);
+}  // создайте интерфейс Subscriber
+// интерфейс должен иметь всего один метод `void update()`, который принимает на вход объект класса `Article`
+
+class OfflineSubscriber implements Subscriber /* реализуйте интерфейс Subscriber */ {
+
+    private final String address;
+
+    public OfflineSubscriber(final String address) {
+        this.address = address;
+    }
+
+    @Override
+    public void update(Article article) {
+        System.out.println(article.title + " была доставлена по адресу: " + address);
+    }
+
+    // метод update должен выводить текст "{article.title} была доставлена по адресу: {address}"
+}
+
+class WebSite implements Subscriber /* реализуйте интерфейс Subscriber */ {
+
+    private final String url;
+
+    public WebSite(final String url) {
+        this.url = url;
+    }
+
+    @Override
+    public void update(Article article) {
+        System.out.println(article.title + " опубликована на страничке: " + url);
+    }
+
+    // метод update должен выводить текст "{article.title} опубликована на страничке: {url}"
+}
+
+class NewspaperPublisher {
+
+    List<Subscriber> subscribers = new ArrayList<>();// создайте список подписчиков List<Subscriber> с именем subscribers
+    // для отправки статей подписчикам вам нужно хранить их в списке
+
+    private final List<Article> articles;
+
+    public NewspaperPublisher(final List<Article> articles) {
+        this.articles = articles;
+    }
+
+    public void subscribe(Subscriber subscriber) {
+        if (!subscribers.contains(subscriber)) {
+            subscribers.add(subscriber);
+        }
+    } // метод void subscribe() должен принимать на вход любой объект, реализующий интерфейс Subscriber
+    // при вызове метода subscribe() новый подписчик должен добавляться в список подписчиков.
+    // в списке подписчиков не должно быть дубликатов. Вы можете проверить, есть ли уже этот подписчик в списке методом List.contains()
+    public void unsubscribe(Subscriber subscriber) {
+        subscribers.remove(subscriber);
+    }
+    // метод void unsubscribe() должен принимать на вход любой объект, реализующий интерфейс Subscriber
+    // при вызове данного метода подписчик должен удаляться из списка подписчиков
+
+    public void startWork(){
+        for (Subscriber subscriber:subscribers) {
+            for (Article article:articles) {
+                subscriber.update(article);
+            }
+        }
+    }// метод void startWork() должен отправлять все статьи, которые хранятся в данный момент в списке articles, всем подписчикам
+
+    public void publishNewArticle(Article article){
+        articles.add(article);
+        for (Subscriber subscriber:subscribers) {
+            subscriber.update(article);
+        }
+    }// метод void publishNewArticle() принимает на вход объект класса Article
+
+    // метод должен добавлять новую статью в список статей articles, а также делать рассылку новой статьи всем активным подписчикам
+}
